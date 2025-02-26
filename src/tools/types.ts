@@ -1,6 +1,6 @@
 import { Matrix4 } from "three"
 
-export const getType = ({ value }: { value: any }) => {
+export const getType = (value: any) => {
 
     let type: string = typeof value
 
@@ -9,7 +9,8 @@ export const getType = ({ value }: { value: any }) => {
     }
 
     if (Array.isArray(value)) {
-        console.info('array')
+        if (value.length === 2) type = 'vector2'
+        if (value.length === 3) type = 'vector3'
     }
 
     return type

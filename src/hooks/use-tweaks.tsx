@@ -1,23 +1,21 @@
 import { create } from 'zustand'
-import { Fragment, useEffect } from 'react'
+import { useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Grid2 as Grid, Paper, TextField } from '@mui/material'
 import { immer } from 'zustand/middleware/immer'
-import { Vector3 } from 'three'
-import { Numbers } from '../components/numbers'
-import { getType } from '../tools/types'
+import { Tweaks } from '../components/tweaks/tweaks'
 
 let tweaksInitialized = false
 
 interface State {
     [key: string]: any
 }
-
 interface Store {
     state: State
     setProperty: (key: string, value: any) => void
     setValue: (key: string, value: any) => void
 }
+
+type StateWithSetter = [State, setValue: Function]
 
 export const useTweakStore = create<Store>()(immer((set) => ({
     state: {},
@@ -28,15 +26,15 @@ export const useTweakStore = create<Store>()(immer((set) => ({
                 [key]: value,
             },
         })),
-    setValue: (key: string, value: any) => set((state) => {
-        state.state[key].value = value
+    setValue: (key: string, value: any) => set(store => {
+        store.state[key].value = value
     })
 })))
 
-export const useTweaks = (label: string, initialValues: State) => {
+export const useTweaks = (label: string, initialValues: State): StateWithSetter => {
 
-    // @todo order by labels 
-    const { state, setProperty } = useTweakStore()
+    // @todo make key path with labels 
+    const { state, setProperty, setValue } = useTweakStore()
 
     useEffect(() => {
 
@@ -52,79 +50,7 @@ export const useTweaks = (label: string, initialValues: State) => {
 
     renderTweaks()
 
-    return values
-}
-
-const isColor = (color: string) => {
-    const s = new Option().style;
-    s.color = color;
-    return s.color !== '';
-}
-
-const RenderString = ({ stateKey }: { stateKey: string }) => {
-
-    const { state, setValue } = useTweakStore()
-
-    if (isColor(state[stateKey].value)) {
-
-        return (
-            <input
-                type="color"
-                value={state[stateKey].value}
-                onChange={(event) => setValue(stateKey, event.target.value)} />
-        )
-    }
-
-    return (
-        <TextField
-            value={state[stateKey].value}
-            sx={{ width: 100 }}
-            onChange={event => setValue(stateKey, event.target.value)}
-            size="small" />
-    )
-}
-
-const RenderMatrix4 = ({ stateKey }: { stateKey: string }) => {
-
-    const { state } = useTweakStore()
-    const position = new Vector3().setFromMatrixPosition(state[stateKey].value)
-
-    return (
-        <>
-            x: {position.x}
-        </>
-    )
-}
-
-const Tweaks = () => {
-
-    const { state } = useTweakStore()
-
-    return (
-        <Paper elevation={2} sx={{ position: 'absolute', zIndex: 100000, top: 10, right: 10, width: 300, m: 1, p: 1 }}>
-            <Grid container>
-                {
-                    Object.keys(state).map(key => {
-
-                        const type = getType(state[key].value)
-
-                        return (
-                            <Fragment key={key}>
-                                <Grid size={4}>
-                                    {key}
-                                </Grid>
-                                <Grid size={8}>
-                                    {type === 'number' && <Numbers storeKey={key} />}
-                                    {type === 'string' && <RenderString stateKey={key} />}
-                                    {type === 'matrix4' && <RenderMatrix4 stateKey={key} />}
-                                </Grid>
-                            </Fragment>
-                        )
-                    })
-                }
-            </Grid>
-        </Paper>
-    )
+    return [values, setValue]
 }
 
 const renderTweaks = () => {

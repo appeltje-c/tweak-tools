@@ -1,7 +1,7 @@
 import { Slider, TextField } from "@mui/material"
-import { useTweakStore } from "../hooks/use-tweaks"
+import { useTweakStore } from "../../hooks/use-tweaks"
 
-export const Numbers = ({ storeKey }: { storeKey: string }) => {
+export const NumberInput = ({ storeKey }: { storeKey: string }) => {
 
     const { state, setValue } = useTweakStore()
     const tweak = state[storeKey]
