@@ -1,10 +1,10 @@
 import { Slider, TextField } from "@mui/material"
 import { useTweakStore } from "../../hooks/use-tweaks"
 
-export const NumberInput = ({ storeKey }: { storeKey: string }) => {
+export const NumberInput = ({ label, storeKey }: { label: string, storeKey: string }) => {
 
     const { state, setValue } = useTweakStore()
-    const tweak = state[storeKey]
+    const tweak = state[label][storeKey]
 
     if (tweak.hasOwnProperty('min') && tweak.hasOwnProperty('max')) {
 
@@ -13,7 +13,7 @@ export const NumberInput = ({ storeKey }: { storeKey: string }) => {
                 size='small'
                 valueLabelDisplay="auto"
                 value={tweak.value}
-                onChange={(_, newValue) => setValue(storeKey, newValue)}
+                onChange={(_, newValue) => setValue(label, storeKey, newValue)}
                 step={tweak.hasOwnProperty('step') ? tweak.step : 1}
                 min={tweak.min}
                 max={tweak.max} />
@@ -25,7 +25,7 @@ export const NumberInput = ({ storeKey }: { storeKey: string }) => {
             type='number'
             value={tweak.value}
             sx={{ width: 100 }}
-            onChange={event => setValue(storeKey, Number(event.target.value))}
+            onChange={event => setValue(label, storeKey, Number(event.target.value))}
             size="small" />
     )
 }

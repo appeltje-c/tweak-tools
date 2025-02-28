@@ -11,7 +11,7 @@ export const Vector3Input = ({ storeKey }: { storeKey: string }) => {
             value={tweak.value}
             sx={{ width: 100 }}
             onChange={event => {
-                setValue(storeKey, Number(event.target.value))
+                setValue('', storeKey, Number(event.target.value))
             }}
             size="small" />
     )

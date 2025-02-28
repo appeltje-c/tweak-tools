@@ -7,25 +7,26 @@ const isColor = (color: string) => {
     return s.color !== '';
 }
 
-export const StringInput = ({ storeKey }: { storeKey: string }) => {
+export const StringInput = ({ label, storeKey }: { label: string, storeKey: string }) => {
 
     const { state, setValue } = useTweakStore()
+    const tweak = state[label][storeKey]
 
-    if (isColor(state[storeKey].value)) {
+    if (isColor(tweak.value)) {
 
         return (
             <input
                 type="color"
-                value={state[storeKey].value}
-                onChange={(event) => setValue(storeKey, event.target.value)} />
+                value={tweak.value}
+                onChange={(event) => setValue(label, storeKey, event.target.value)} />
         )
     }
 
     return (
         <TextField
-            value={state[storeKey].value}
+            value={tweak.value}
             sx={{ width: 100 }}
-            onChange={event => setValue(storeKey, event.target.value)}
+            onChange={event => setValue(label, storeKey, event.target.value)}
             size="small" />
     )
 }

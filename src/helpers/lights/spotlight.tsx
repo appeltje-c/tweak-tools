@@ -5,10 +5,10 @@ import { Helper, TransformControls } from "@react-three/drei"
 import { useFrame } from "@react-three/fiber"
 import { useTweaks } from "../../hooks/use-tweaks"
 
-export const Spotlight = () => {
+export const Spotlight = ({ label }: { label: string }) => {
 
     const spotLightRef = useRef<SpotLight>(null!)
-    const [{ x, y, z, color, intensity, distance, angle, penumbra, decay, castShadow, helper, controls }, setValue] = useTweaks('Spotlight', {
+    const [{ x, y, z, color, intensity, distance, angle, penumbra, decay, castShadow, helper, controls }, setValue] = useTweaks(label, {
         x: { value: 0 },
         y: { value: 0 },
         z: { value: 0 },
@@ -21,6 +21,8 @@ export const Spotlight = () => {
         castShadow: { value: false },
         helper: { value: true },
         controls: { value: true }
+    }, {
+        print: true
     })
 
     useFrame(() => {
@@ -36,9 +38,9 @@ export const Spotlight = () => {
                     onObjectChange={(event) => {
                         if (event) {
                             const position = (event.target as any).object.position
-                            setValue('x', position.x)
-                            setValue('y', position.y)
-                            setValue('z', position.z)
+                            setValue(label, 'x', position.x)
+                            setValue(label, 'y', position.y)
+                            setValue(label, 'z', position.z)
                         }
                     }} />
             }
@@ -54,7 +56,7 @@ export const Spotlight = () => {
                 decay={decay} >
                 {
                     helper &&
-                    <Helper type={SpotLightHelper} args={['grey']} />
+                    <Helper type={SpotLightHelper} args={['#fff']} />
                 }
             </spotLight>
         </>

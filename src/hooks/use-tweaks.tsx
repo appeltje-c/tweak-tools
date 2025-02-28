@@ -11,53 +11,58 @@ interface State {
 }
 interface Store {
     state: State
-    setProperty: (key: string, value: any) => void
-    setValue: (key: string, value: any) => void
+    setProperty: (label: string, key: string, value: any) => void
+    setValue: (label: string, key: string, value: any) => void
 }
 
-type StateWithSetter = [State, setValue: Function]
+type StateWithSetter = [State, (label: string, key: string, value: any) => void]
 
 export const useTweakStore = create<Store>()(immer((set) => ({
     state: {},
-    setProperty: (key, value) =>
+    setProperty: (label, key, value) =>
         set((state) => ({
             state: {
                 ...state.state,
-                [key]: value,
+                [label]: {
+                    ...state.state[label],
+                    [key]: value,
+                },
             },
         })),
-    setValue: (key: string, value: any) => set(store => {
-        store.state[key].value = value
+    setValue: (label: string, key: string, value: any) => set(store => {
+        store.state[label][key].value = value
     })
 })))
 
-export const useTweaks = (label: string, initialValues: State): StateWithSetter => {
+export const useTweaks = (label: string, initialValues: State, options?: {}): StateWithSetter => {
 
     // @todo make key path with labels 
     const { state, setProperty, setValue } = useTweakStore()
 
     useEffect(() => {
-
         Object.keys(initialValues).forEach((key) => {
-            setProperty(key, initialValues[key])
+            setProperty(label, key, initialValues[key])
         })
     }, [])
 
     const values = Object.keys(initialValues).reduce((acc, key) => {
-        acc[key] = state[key] ? state[key].value : undefined
+        acc[key] = state[label] ? state[label][key].value : undefined
         return acc
     }, {} as State)
 
-    renderTweaks()
+    renderTweaks({ options })
 
     return [values, setValue]
 }
 
-const renderTweaks = () => {
+const renderTweaks = ({ ...args }) => {
 
     useEffect(() => {
 
         if (!tweaksInitialized) {
+
+            console.info('!tweaksInitialized')
+
             let domNode = document.getElementById('tweak__tools')
             if (!domNode) {
                 domNode = document.createElement('div')
@@ -66,7 +71,7 @@ const renderTweaks = () => {
             }
 
             const root = createRoot(domNode)
-            root.render(<Tweaks />)
+            root.render(<Tweaks {...args} />)
             tweaksInitialized = true
         }
     }, [])
